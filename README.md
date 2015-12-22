@@ -166,3 +166,11 @@ history(not for container,but for image)
 docker history centos:latest
 ```
 
+- More Useful Docker CLI Commands
+```
+docker -D info   //debug
+```
+```
+docker export containername > x.tar
+docker load -i x.tar
+```
