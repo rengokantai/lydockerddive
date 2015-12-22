@@ -294,3 +294,7 @@ alternatives --config java
 alternatives --set jar /opt/java/bin/jar
 alternatives --set javac /opt/java/bin/javac
 ```
+- Testing Version Compatibility - Using Tomcat and Java (Part Three)
+```
+docker run -i -t --name=tom -v /root/docker/download:/root/downloads -p 8000:80 -e(env) JAVA_HOME=/opt/java -e JRE_HOME=/opt/java centos6:jdk7 /bin/bash
+```
