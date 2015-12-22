@@ -1,5 +1,20 @@
 #### lydockerddive
 
+- Packaging A Customized Container
+After pulling a image,
+```
+docker commit -m="message" -a="author" imageid  author/imagename
+```
+Then build our own container using this image.
+```
+docker run -t -i author/imagename:tag /bin/bash
+```
+
+Using dockerfile:
+```
+docker build -t="ubuntu:latest" .
+```
+
 - Directory Structure
 ```
 cd /var/lib/docker
@@ -173,4 +188,109 @@ docker -D info   //debug
 ```
 docker export containername > x.tar
 docker load -i x.tar
+```
+- Optimizing Our Dockerfile Builds
+'Command chaining'
+Original commands:
+```
+FROM centos:centos6
+MAINTAINER ...
+RUN yum -y update
+RUN yum -y install httpd
+RUN echo "/sbin/service httpd start" >> /root/.bashrc
+
+RUN yum -y install openssh-server
+RUN echo "/sbin/server sshd start" >> /root/.bashrc
+
+RUN echo "Ended" > /root/README
+```
+Optimized:
+```
+FROM centos:centos6
+MAINTAINER ...
+RUN yum -y update &&
+yum -y install httpd &&
+echo "/sbin/service httpd start" >> /root/.bashrc &&
+yum -y install openssh-server &&
+echo "/sbin/server sshd start" >> /root/.bashrc &&
+
+RUN echo "Ended" > /root/README
+```
+- Exercise: Advanced Container Creation at the Command Line
+```
+cat /etc/resolv.conf 
+```
+
+- Building a Web Farm for Development and Testing (Part Four)
+```
+git clone root@localhost:/root/docker/dockergit localfolder
+```
+configure nginx
+```
+cd /etc/nginx
+cd sites-available
+vi default.conf
+```
+Add the following content:
+```
+upstream containerapp{
+ server 192.168.1.35:8081;
+ server 192.168.1.35:8082;
+}
+
+server{ 
+ listen *:80;
+ server_name: 192.168.1.35;
+ index index.html index.htm index.php;
+ access_log /var/log/nginx/localweb.log;
+ error_log /var/log/nginx/localerr.log;
+ location /{
+  proxy_pass http://conatainerapp;
+ }
+}
+}
+```
+- Integrating Custom Network In Your Docker Containers
+```
+ip link add br10 type bridge
+ip addr add 10.10.100.1/24 dev br10
+ip link set br10 up
+```
+Then
+```
+docker.io -d -b br10 &
+```
+```
+cd /etc
+vim rc.local
+```
+OR
+```
+cd /etc/network
+vim interfaces
+```
+edit content:
+```
+auto lo
+iface lo inet loopback
+
+auto br10
+iface br10 inet static
+    address 10.01.100.1
+    netmask 255.255.255.0
+    bridge_ports dummy0
+    bridge_stp off
+    bridge_fd 0
+```
+- Testing Version Compatibility - Using Tomcat and Java (Part One)
+```
+alternatives --install /usr/bin/java java /opt/java/bin/java 2 (syntax: alternatives linkpath name actualpath priority)
+alternatives --install /usr/bin/jar jar /opt/java/bin/jar 2
+alternatives --install /usr/bin/java javac /opt/java/bin/javac 2
+alternatives --config java
+```
+
+```
+alternatives --set jar /opt/java/bin/jar
+alternatives --set javac /opt/java/bin/javac
 ```
